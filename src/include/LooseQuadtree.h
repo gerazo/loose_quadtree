@@ -22,7 +22,8 @@
  * Generic parameters are:
  * - NumberT generic number type allows its floating- and fixed-point usage
  * - ObjectT* pointer is stored, no object copying, not an inclusive container
- * - BoundingBoxExtractorT allows using your own bounding box type/source
+ * - BoundingBoxExtractorT allows using your own bounding box type/source, needs
+ *     BoundingBoxExtractor::ExtractBoundingBox(ObjectT* in, BoundingBox<Number>* out) implemented
  */
 
 
