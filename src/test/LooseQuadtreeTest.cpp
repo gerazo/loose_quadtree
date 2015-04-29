@@ -232,10 +232,12 @@ void TestInsertRemove(bool reclaim_losses) {
 	LooseQuadtree<NumberT, BoundingBox<NumberT>, TrivialBBExtractor<NumberT>> lqt;
 	if (reclaim_losses) lqt.ReclaimLosses();
 	ASSERT(lqt.GetSize() == 0);
+	ASSERT(lqt.IsEmpty());
 	ASSERT(!lqt.Contains(&objects[0]));
 	ASSERT(lqt.GetSize() == 0);
 	lqt.Insert(&objects[0]);
 	ASSERT(lqt.GetSize() == 1);
+	ASSERT(!lqt.IsEmpty());
 	ASSERT(lqt.Contains(&objects[0]));
 	ASSERT(!lqt.Contains(&objects[1]));
 	ASSERT(lqt.GetBoundingBox().Intersects(objects[0]));
@@ -243,6 +245,7 @@ void TestInsertRemove(bool reclaim_losses) {
 	lqt.Remove(&objects[0]);
 	ASSERT(!lqt.Contains(&objects[0]));
 	ASSERT(lqt.GetSize() == 0);
+	ASSERT(lqt.IsEmpty());
 	if (reclaim_losses) lqt.ReclaimLosses();
 
 	lqt.Insert(&objects[1]);
@@ -396,6 +399,22 @@ void TestMoreTrees(bool reclaim_losses) {
 		LooseQuadtree<NumberT, BoundingBox<NumberT>, TrivialBBExtractor<NumberT>> lqt2;
 		lqt2.Insert(&objects[1]);
 		if (reclaim_losses) lqt2.ReclaimLosses();
+	}
+	{
+		LooseQuadtree<NumberT, BoundingBox<NumberT>, TrivialBBExtractor<NumberT>> lqt2;
+		lqt2.Insert(&objects[1]);
+		lqt2.Insert(&objects[2]);
+		lqt2.Insert(&objects[0]);
+		ASSERT(lqt2.Contains(&objects[1]));
+		lqt2.Clear();
+		ASSERT(lqt2.GetSize() == 0);
+		ASSERT(!lqt2.Contains(&objects[1]));
+		if (reclaim_losses) lqt2.ReclaimLosses();
+		ASSERT(lqt2.GetSize() == 0);
+		ASSERT(!lqt2.Contains(&objects[1]));
+		lqt2.Insert(&objects[1]);
+		ASSERT(lqt2.GetSize() == 1);
+		ASSERT(lqt2.Contains(&objects[1]));
 	}
 	ASSERT(lqt.GetSize() == 3);
 	ASSERT(lqt.Contains(&objects[0]));

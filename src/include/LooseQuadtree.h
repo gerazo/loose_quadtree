@@ -95,6 +95,8 @@ public:
 	Query QueryContainsRegion(const BoundingBox<Number>& region);
 	const BoundingBox<Number>& GetBoundingBox() const; ///< loose sense bounds
 	int GetSize() const;
+	bool IsEmpty() const;
+	void Clear();
 	void ReclaimLosses();
 
 private:

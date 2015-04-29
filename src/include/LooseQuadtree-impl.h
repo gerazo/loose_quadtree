@@ -458,6 +458,7 @@ public:
 	Query QueryContainsRegion(const BoundingBox<Number>& region);
 	const BoundingBox<Number>& GetBoundingBox() const;
 	int GetSize() const;
+	void Clear();
 	void ReclaimLosses();
 
 private:
@@ -978,7 +979,6 @@ Impl() :
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 ~Impl() {
-	object_pointers_.clear();
 	DeleteTree();
 }
 
@@ -1076,6 +1076,14 @@ GetSize() const {
 	return number_of_objects_;
 }
 
+template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
+void
+	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
+Clear() {
+	DeleteTree();
+}
+
+
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 void
@@ -1100,6 +1108,7 @@ template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 void
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 DeleteTree() {
+	object_pointers_.clear();
 	detail::FullTreeTraversal<Number, Object>& trav = internal_traversal_;
 	trav.StartAt(root_, bounding_box_);
 	while (root_ != nullptr) {
@@ -1150,6 +1159,10 @@ DeleteTree() {
 			}
 		}
 	}
+
+	bounding_box_ = BoundingBox<Number>(0, 0, 0, 0);
+	number_of_objects_ = 0;
+	maximal_depth_ = kInternalMinDepth;
 }
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
@@ -1406,6 +1419,20 @@ int
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
 GetSize() const {
 	return impl_.GetSize();
+}
+
+template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
+bool
+	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
+IsEmpty() const {
+	return impl_.GetSize() == 0;
+}
+
+template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
+void
+	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
+Clear() {
+	impl_.Clear();
 }
 
 
