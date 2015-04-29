@@ -459,7 +459,7 @@ public:
 	const BoundingBox<Number>& GetBoundingBox() const;
 	int GetSize() const;
 	void Clear();
-	void ReclaimLosses();
+	void ForceCleanup();
 
 private:
 	friend class Query::Impl;
@@ -1061,7 +1061,7 @@ GetBoundingBox() const {
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 void
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-ReclaimLosses() {
+ForceCleanup() {
 	Query query = QueryIntersectsRegion(bounding_box_);
 	while (!query.EndOfQuery()) {
 		query.Next();
@@ -1410,8 +1410,8 @@ GetBoundingBox() const {
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 void
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-ReclaimLosses() {
-	impl_.ReclaimLosses();
+ForceCleanup() {
+	impl_.ForceCleanup();
 }
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>

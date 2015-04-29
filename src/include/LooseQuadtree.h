@@ -97,7 +97,8 @@ public:
 	int GetSize() const;
 	bool IsEmpty() const;
 	void Clear();
-	void ReclaimLosses();
+	void ForceCleanup(); ///< does a full data structure and memory cleanup
+	///< cleanup is semi-automatic during queries so you needn't call this normally
 
 private:
 	Impl impl_;
