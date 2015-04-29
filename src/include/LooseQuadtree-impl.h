@@ -998,12 +998,7 @@ template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 Update(Object* object) {
-	bool was_removed = Remove(object);
-	Object** place = InsertIntoTree(object);
-	object_pointers_.emplace(object, place);
-	number_of_objects_++;
-	RecalculateMaximalDepth();
-	return was_removed;
+	return !Insert(object);
 }
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
