@@ -429,6 +429,7 @@ private:
 	typename detail::TreeNode<Object>::ObjectContainer::iterator object_iterator_before_;
 	BoundingBox<Number> query_region_;
 	QueryType query_type_;
+	int free_ride_from_level_;
 };
 
 
@@ -699,7 +700,8 @@ GoUp() {
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Query::Impl::
 Impl() : quadtree_(nullptr), query_region_(0,0,0,0),
-	query_type_(QueryType::kEndOfQuery) {
+	query_type_(QueryType::kEndOfQuery),
+	free_ride_from_level_(LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl::kInternalMaxDepth) {
 }
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
@@ -712,6 +714,8 @@ Acquire(LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
 	quadtree_ = quadtree;
 	query_region_ = *query_region;
 	query_type_ = query_type;
+	free_ride_from_level_ =
+		LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl::kInternalMaxDepth;
 	if (quadtree->root_ == nullptr) {
 		query_type_ = QueryType::kEndOfQuery;
 	}
@@ -762,9 +766,6 @@ void
 Next() {
 	assert(!IsAvailable());
 	assert(!EndOfQuery());
-	// TODO: this shound not be local... freeride is not working this way
-	int free_ride_from_level =
-		LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl::kInternalMaxDepth;
 	do {
 		object_iterator_before_ = object_iterator_;
 		object_iterator_++;
@@ -863,8 +864,8 @@ Next() {
 							quadtree_->allocator_.Delete(node);
 						}
 
-						if (free_ride_from_level == traversal_.GetDepth() + 1) {
-							free_ride_from_level =
+						if (free_ride_from_level_ == traversal_.GetDepth() + 1) {
+							free_ride_from_level_ =
 								LooseQuadtree<Number, Object,
 									BoundingBoxExtractor>::Impl::kInternalMaxDepth;
 						}
@@ -894,10 +895,10 @@ Next() {
 				assert(traversal_.GetNodeCurrentChild() == detail::ChildPosition::kNone);
 				{
 					FitType fit = FitType::kPartialFit;
-					if (traversal_.GetDepth() >= free_ride_from_level ||
+					if (traversal_.GetDepth() >= free_ride_from_level_ ||
 							(fit = CurrentNodeFits()) != FitType::kNoFit) {
 						if (fit == FitType::kFreeRide) {
-							free_ride_from_level = traversal_.GetDepth();
+							free_ride_from_level_ = traversal_.GetDepth();
 						}
 					}
 					else {
@@ -916,7 +917,7 @@ Next() {
 			object_iterator_ = object_iterator_before_;
 		}
 		else {
-			if (traversal_.GetDepth() >= free_ride_from_level ||
+			if (traversal_.GetDepth() >= free_ride_from_level_ ||
 					CurrentObjectFits()) {
 				break;
 			}
