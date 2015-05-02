@@ -4,9 +4,11 @@
 /**
  * LooseQuadtree written by Zozo
  * use freely under MIT license
+ *
  * Loose quadtree (unlike normal quadtrees which are for points only) is
- * a region tree designed to store bounding boxes
+ * a region tree designed to store bounding boxes effectively
  * See boost::geometry::index::rtree for a more advanced, general solution!
+ *
  * This implementation features:
  * - Fully adaptive behavior, adjusts its bounds, height and memory on demand
  * - Every object will be stored on the level to which its size corresponds to
@@ -19,9 +21,11 @@
  * - Uses left-top closed right-bottom open interval logic (for integral types)
  * - Uses X-towards-right Y-towards-bottom screen-like coordinate system
  * - It is suitable for both floating- and fixed-point logic
+ * - This library is not thread-safe but multiple queries can be run at once
+ *
  * Generic parameters are:
  * - NumberT generic number type allows its floating- and fixed-point usage
- * - ObjectT* pointer is stored, no object copying, not an inclusive container
+ * - ObjectT* only pointer is stored, no object copying is done, not an inclusive container
  * - BoundingBoxExtractorT allows using your own bounding box type/source, needs
  *     BoundingBoxExtractor::ExtractBoundingBox(ObjectT* in, BoundingBox<Number>* out) implemented
  */
