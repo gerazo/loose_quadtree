@@ -97,7 +97,8 @@ public:
 	Query QueryIntersectsRegion(const BoundingBox<Number>& region);
 	Query QueryInsideRegion(const BoundingBox<Number>& region);
 	Query QueryContainsRegion(const BoundingBox<Number>& region);
-	const BoundingBox<Number>& GetBoundingBox() const; ///< loose sense bounds
+	const BoundingBox<Number>& GetLooseBoundingBox() const;
+	///< double its size to get a bounding box including everything contained for sure
 	int GetSize() const;
 	bool IsEmpty() const;
 	void Clear();

@@ -457,7 +457,7 @@ public:
 	Query QueryIntersectsRegion(const BoundingBox<Number>& region);
 	Query QueryInsideRegion(const BoundingBox<Number>& region);
 	Query QueryContainsRegion(const BoundingBox<Number>& region);
-	const BoundingBox<Number>& GetBoundingBox() const;
+	const BoundingBox<Number>& GetBoundingBox() const; ///< loose sense bounds
 	int GetSize() const;
 	void Clear();
 	void ForceCleanup();
@@ -484,7 +484,7 @@ private:
 	int maximal_depth_;
 	detail::FullTreeTraversal<Number, Object> internal_traversal_;
 	QueryPoolContainer query_pool_;
-	int running_queries_; //< queries which are opened and not at their end
+	int running_queries_; ///< queries which are opened and not at their end
 };
 
 
@@ -1427,7 +1427,7 @@ QueryContainsRegion(const BoundingBox<Number>& region) -> Query {
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 const BoundingBox<NumberT>&
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-GetBoundingBox() const {
+GetLooseBoundingBox() const {
 	return impl_.GetBoundingBox();
 }
 
