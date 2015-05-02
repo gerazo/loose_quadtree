@@ -19,10 +19,10 @@ This implementation features:
  * Uses X-towards-right Y-towards-bottom screen-like coordinate system
  * It is suitable for both floating- and fixed-point logic
  * This library is not thread-safe but multiple queries can be run at once
-
  * Generic parameters are:
    * NumberT generic number type allows its floating- and fixed-point usage
    * ObjectT* only pointer is stored, no object copying is done, not an inclusive container
    * BoundingBoxExtractorT allows using your own bounding box type/source (see code)
+ * Compiles on gcc-4.8, gcc-4.9, clang-3.5, clang-3.6
 
 LooseQuadtree was written by Zozó, use freely under MIT license
