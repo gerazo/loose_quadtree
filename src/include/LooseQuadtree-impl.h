@@ -483,6 +483,7 @@ private:
 	int maximal_depth_;
 	detail::FullTreeTraversal<Number, Object> internal_traversal_;
 	QueryPoolContainer query_pool_;
+	int running_queries_; //< queries which are opened and not at their end
 };
 
 
@@ -715,6 +716,7 @@ Acquire(LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
 		query_type_ = QueryType::kEndOfQuery;
 	}
 	else {
+		quadtree_->running_queries_++;
 		traversal_.StartAt(quadtree->root_, quadtree->bounding_box_);
 		object_iterator_ = traversal_.GetNode()->objects.before_begin();
 		Next();
@@ -760,6 +762,7 @@ void
 Next() {
 	assert(!IsAvailable());
 	assert(!EndOfQuery());
+	// TODO: this shound not be local... freeride is not working this way
 	int free_ride_from_level =
 		LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl::kInternalMaxDepth;
 	do {
@@ -805,7 +808,18 @@ Next() {
 					}
 					break;
 				case detail::ChildPosition::kBottomLeft:
-					if (traversal_.GetDepth() > quadtree_->maximal_depth_) {
+
+#ifndef NDEBUG
+					int running_queries = 0;
+					for (auto& query : quadtree_->query_pool_) {
+						if (!query.IsAvailable() && !query.EndOfQuery()) running_queries++;
+					}
+					assert(running_queries == quadtree_->running_queries_);
+#endif
+
+					//only run this if no parallel queries are running
+					if (traversal_.GetDepth() > quadtree_->maximal_depth_ &&
+							quadtree_->running_queries_ == 1) {
 						typename detail::TreeNode<Object>::ObjectContainer& objects =
 								traversal_.GetNode()->objects;
 						auto iterator = objects.begin();
@@ -827,6 +841,8 @@ Next() {
 								traversal_.GetNode()->bottom_left == nullptr);
 						detail::TreeNode<Object>* node = traversal_.GetNode();
 						traversal_.GoUp();
+
+						// if the node is empty no other queries can be invalidated by deleting
 						if (remove_node) {
 							switch (traversal_.GetNodeCurrentChild()) {
 							case detail::ChildPosition::kTopLeft:
@@ -846,6 +862,7 @@ Next() {
 							}
 							quadtree_->allocator_.Delete(node);
 						}
+
 						if (free_ride_from_level == traversal_.GetDepth() + 1) {
 							free_ride_from_level =
 								LooseQuadtree<Number, Object,
@@ -854,6 +871,7 @@ Next() {
 						continue;
 					}
 					else {
+						// if the root is empty no other queries can be invalidated by deleting
 						if (traversal_.GetNode()->objects.empty() &&
 								traversal_.GetNode()->top_left == nullptr &&
 								traversal_.GetNode()->top_right == nullptr &&
@@ -866,6 +884,8 @@ Next() {
 							quadtree_->root_ = nullptr;
 							quadtree_->bounding_box_ = BoundingBox<Number>(0,0,0,0);
 						}
+
+						quadtree_->running_queries_--;
 						query_type_ = QueryType::kEndOfQuery;
 						return;
 					}
@@ -890,6 +910,8 @@ Next() {
 			} while (true);
 		}
 		else if (*object_iterator_ == nullptr) {
+			// other queries also cannot stop on an empty object,
+			// so we are not invalidating any iterators/queries with this
 			traversal_.GetNode()->objects.erase_after(object_iterator_before_);
 			object_iterator_ = object_iterator_before_;
 		}
@@ -971,7 +993,8 @@ Impl() :
 	root_(nullptr), bounding_box_(0, 0, 0, 0),
 	object_pointers_(64, std::hash<Object*>(), std::equal_to<Object*>(),
 		detail::BlocksAllocatorAdaptor<std::pair<const Object*, Object**>>(allocator_)),
-	number_of_objects_(0), maximal_depth_(kInternalMinDepth) {
+	number_of_objects_(0), maximal_depth_(kInternalMinDepth),
+	running_queries_(0) {
 	assert(maximal_depth_ < kInternalMaxDepth);
 	//object_pointers_.reserve(64);
 }
