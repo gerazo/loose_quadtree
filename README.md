@@ -23,6 +23,6 @@ This implementation features:
    * NumberT generic number type allows its floating- and fixed-point usage
    * ObjectT* only pointer is stored, no object copying is done, not an inclusive container
    * BoundingBoxExtractorT allows using your own bounding box type/source (see code)
- * Compiles on gcc-4.8, gcc-4.9, clang-3.5, clang-3.6
+ * Compiles on gcc-4.8, gcc-4.9, gcc-5.2, clang-3.5, clang-3.6
 
 LooseQuadtree was written by Zozó, use freely under MIT license
