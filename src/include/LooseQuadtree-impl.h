@@ -409,7 +409,7 @@ public:
 	enum class QueryType {kIntersects, kInside, kContains, kEndOfQuery};
 
 	Impl();
-	void Acquire(LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
+	void Acquire(typename LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
 		const BoundingBox<Number>* query_region, QueryType query_type);
 	void Release();
 	bool IsAvailable() const;
@@ -423,7 +423,7 @@ private:
 	bool CurrentObjectFits() const;
 	FitType CurrentNodeFits() const;
 
-	LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree_;
+	typename LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree_;
 	detail::FullTreeTraversal<Number, Object> traversal_;
 	typename detail::TreeNode<Object>::ObjectContainer::iterator object_iterator_;
 	typename detail::TreeNode<Object>::ObjectContainer::iterator object_iterator_before_;
@@ -707,7 +707,7 @@ Impl() : quadtree_(nullptr), query_region_(0,0,0,0),
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 void
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Query::Impl::
-Acquire(LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
+Acquire(typename LooseQuadtree<Number, Object, BoundingBoxExtractor>::Impl* quadtree,
 		const BoundingBox<Number>* query_region, QueryType query_type) {
 	assert(IsAvailable());
 	assert(query_type != QueryType::kEndOfQuery);
