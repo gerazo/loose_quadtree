@@ -619,16 +619,19 @@ void StressTest() {
 					std::numeric_limits<NumberT>::max() / 8 :
 					std::numeric_limits<NumberT>::max() / 16) :
 					0.5f);
+
 	std::vector<BoundingBox<NumberT>> objects;
 	objects.reserve(objects_generated);
-	std::vector<bool> flags;
-	flags.reserve(objects_generated);
+	std::vector<bool> flags(objects_generated, false);
 	LooseQuadtree<NumberT, BoundingBox<NumberT>, TrivialBBExtractor<NumberT>> lqt;
 	for (std::size_t i = 0; i < objects_generated; i++) {
-		objects[i] = BoundingBox<NumberT>((NumberT)coordinate(rand), (NumberT)coordinate(rand),
+		objects.emplace_back((NumberT)coordinate(rand), (NumberT)coordinate(rand),
 				(NumberT)distance(rand), (NumberT)distance(rand));
 		lqt.Insert(&objects[i]);
 	}
+	ASSERT(objects.size() == objects_generated);
+	ASSERT(flags.size() == objects_generated);
+
 	for (int round = 0; round < full_rounds; round++) {
 		for (int fluctobj = 0; fluctobj < object_fluctuation; fluctobj++) {
 			std::size_t id = index(rand);
