@@ -440,7 +440,7 @@ class
 Impl {
 public:
 	constexpr static int kInternalMinDepth = 4;
-	constexpr static int kInternalMaxDepth = 128;
+	constexpr static int kInternalMaxDepth = (sizeof(long long) * 8 - 1) / 2;
 	constexpr static Number kMinimalObjectExtent =
 		std::is_integral<Number>::value ? 1 :
 			std::numeric_limits<Number>::min() * 16;
@@ -1114,12 +1114,12 @@ void
 	LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 RecalculateMaximalDepth() {
 	do {
-		if (number_of_objects_ > 1 << (maximal_depth_ << 1) &&
-				maximal_depth_ < kInternalMaxDepth) {
+		if (maximal_depth_ < kInternalMaxDepth &&
+				number_of_objects_ > 1ll << (maximal_depth_ << 1)) {
 			maximal_depth_++;
 		}
-		else if (number_of_objects_ <= 1 << ((maximal_depth_ - 1) << 1) &&
-				maximal_depth_ > kInternalMinDepth) {
+		else if (maximal_depth_ > kInternalMinDepth &&
+				number_of_objects_ <= 1ll << ((maximal_depth_ - 1) << 1)) {
 			maximal_depth_--;
 		}
 		else {
